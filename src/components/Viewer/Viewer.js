@@ -198,7 +198,7 @@ class Viewer extends Component {
 
     return (
       <div>
-        <MeshUpload onUpload={this.handleUpload}/>
+        {/* <MeshUpload onUpload={this.handleUpload}/> */}
         <Divider />
         <div
           className="Viewer"

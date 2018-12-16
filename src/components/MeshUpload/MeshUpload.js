@@ -5,6 +5,38 @@ import FilesList from "../FilesList/FilesList";
 import mime from "mime-types";
 import path from "path";
 
+class dataType {
+  constructor() {
+    this.chest = null;
+    this.waist = null;
+    this.hip = null;
+    this.arm = null;
+    this.height = null;
+    this.age = null;
+  }
+
+  serialize() {
+    if (this.chest == null || this.waist == null || this.hip == null || this.arm == null || this.height == null || this.age == null) {
+      alert('all input must be filled in!'); 
+      return null;
+    } else {
+      var output = `Chest : ${this.chest} | Waist : ${this.waist} | Hip : ${this.hip} | Arm : ${this.arm} | Height : ${this.height} | Age : ${this.age}`;
+      // format(output, 'chest', this.chest, "waist", this.waist, "hip", this.hip, "arm", this.arm, "height", this.height, "age", this.age);
+      console.log(output);
+      return output;
+    }
+
+  }
+  
+}
+
+
+function InputData(props) {
+  return (
+      <input className="inputdata" name={props.value} onChange={props.changeDataCallback}>
+    </input>
+  );
+}
 const promisify = func => (...args) => new Promise((resolve, reject) => func(...args, resolve, reject));
 const promisifyProgress = func => (arg, progress) => new Promise((resolve) => func(arg, resolve, progress));
 
@@ -61,6 +93,7 @@ function getArcLength(fraction, props) {
 
 class MeshUpload extends Component {
   state = {
+    dataInput: new dataType(),
     files: null,
     types: null,
     filesCount: 0,
@@ -68,6 +101,22 @@ class MeshUpload extends Component {
     loading: false,
   };
 
+  setInputData(name) {
+    var targetClass = this;
+    function updateData(e) {
+      // var dataTitle = {name};
+      var data = targetClass.state.dataInput;
+      data[name] = e.target.value;
+      targetClass.setState({dataInput: data});
+    }
+    return updateData;
+  }
+
+  renderInputWidget(name) {
+    return (
+      <InputData value={name} changeDataCallback={this.setInputData(name)}/>
+    );
+  }
   handleError = (error) => {
     this.setState(error);
   };
@@ -198,6 +247,11 @@ class MeshUpload extends Component {
     totalEl.refs.bar1.parentElement.style.width = `${total * 100}%`;
   };
 
+  sendInput = () => {
+    console.log(this.state.dataInput.serialize());
+
+  }
+
   loadExample = () => {
     this.setState({loading: true});
     return fetch('viktor.zip')
@@ -230,19 +284,33 @@ class MeshUpload extends Component {
 
     return (
       <div className="MeshUpload">
-        <RaisedButton
-          label={loading ? 'Summoning...' : 'Summon Viktor'}
-          onClick={this.loadExample}
+        <form>
+          Chest Size: 
+          <input className="inputdata" type="number" name="chest" onChange={this.setInputData("chest")}></input>          
+          Waist Size: 
+          <input className="inputdata" type="number" name="waist" onChange={this.setInputData("waist")}></input>          
+          Arm Size: 
+          <input className="inputdata" type="number" name="arm" onChange={this.setInputData("arm")}></input>          
+          Hip Size: 
+          <input className="inputdata" type="number" name="hip" onChange={this.setInputData("hip")}></input>          
+          Height Size: 
+          <input className="inputdata" type="number" name="height" onChange={this.setInputData("height")}></input>          
+          Age: 
+          <input className="inputdata" type="number" name="age" onChange={this.setInputData("age")}></input>          
+        </form>
+       
+           <RaisedButton
+          label="submit to evaluate"
+          onClick={this.sendInput}
           disabled={loading}
-        />
-        <span style={{margin: '0 5px'}}>or</span>
-        <RaisedButton
+        /> 
+        {/* <RaisedButton
           containerElement="label"
           primary
           label="Load Mesh"
         >
           <input type="file" style={{display: 'none'}} onChange={this.handleChange}/>
-        </RaisedButton>
+        </RaisedButton> */}
         {!files && <p>
           Provide .OBJ file or ZIP archive with .OBJ file or/and its materials and textures
         </p>}
